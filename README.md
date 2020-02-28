@@ -33,7 +33,7 @@ var hasher *argon2.Hasher
 
 func main() {
     hasherSettings := "f=argon2id,s=16,k=32,m=65536,t=3,p=2"
-    hasher, _ := argon2.NewHasherFromString(hasherSettings)
+    hasher, _ = argon2.NewHasherFromString(hasherSettings)
 }
 
 func HashPassword(password string) (string, error) {
@@ -50,9 +50,11 @@ And that's it!
 If you prefer to configure the `Hasher` directly:
 
 ```go
-var hasher *argon2.Hasher
+package main
 
 import "github.com/wranders/go-argon2"
+
+var hasher *argon2.Hasher
 
 func main() {
     hasher = &argon2.Hasher{
