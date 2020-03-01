@@ -18,7 +18,7 @@ go get github.com/wranders/go-argon2
 
 ## What is go-argon2 and how do I use it
 
-This package is a interface for the `argon2` key derivation function using [`golang.org/x/crypto/argon2`](https://golang.org/x/crypto/argon2), aiming to provide the simplest interface.
+This package is an interface for the `argon2` key derivation function using [`golang.org/x/crypto/argon2`](https://golang.org/x/crypto/argon2), aiming to provide the simplest interface.
 
 The `Hasher` is what creates password hashes and is configured directly or generated from a comma-separated key-value string (perfect for storage in configuration files).
 

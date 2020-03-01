@@ -1,48 +1,37 @@
-// Package argon2 provides a simplified interface for the argon2
-// key derivation function using https://golang.org/x/crypto/argon2.
+// Package argon2 is an interface for the Argon2 key dirivation
+// function using https://golang.org/x/crypto/argon2.
 //
-// Configuration is handled by creating a Hasher structure with all
-// attributes populated, or by passing a comma-delimited key-value
-// string to the NewHasherFromString function. The Hasher structure
-// possesses the functions to create and verify password hashes.
+// The Hasher is what creates password hashes and is configured
+// directly or generated from a comma-separated key-value string
+// (perfect for storage in configuration files).
 //
-// argon2i and argon2id are the only supported variants.
+// The Matches function generates parameters from the provided hash
+// so the Hasher is not needed.
 //
-//	func WithString() {
-//	    settings := "f=argon2id,s=16,k=32,m=65536,t=3,p=2"
-//	    hasher, _ := argon2.NewHasherFromString(settings)
+//  package main
 //
-//	    hashPass, _ := hasher.Create("mySecretPassword")
+//  import "github.com/wranders/go-argon2"
 //
-//	    if ok, _ := hasher.Matches("mySecretPassword", hashPass); ok {
-//	        fmt.Println("Pasword matches!")
-//	    } else {
-//	        fmt.Println("Password does not match!")
-//	    }
-//	}
+//  var hasher *argon2.Hasher
 //
-//	func WithStruct() {
-//	    hasher := &argon2.Hasher{
-//	        Form:        argon2.FormI,
-//	        SaltLength:  16,
-//	        KeyLength:   32
-//	        Memory:      65536,
-//	        Iterations:  3,
-//	        Parallelism: 2,
-//	    }
+//  func main() {
+//    hasherSettings := "f=argon2id,s=16,k=32,m=65536,t=3,p=2"
+//    hasher, _ = argon2.NewHasherFromString(hasherSettings)
+//  }
 //
-//	    hashPass, _ := hasher.Create("mySecretPassword")
+//  func HashPassword(password string) (string, error) {
+//    return hasher.Create(password)
+//  }
 //
-//	    if ok, _ := hasher.Matches("mySecretPassword", hashPass); ok {
-//	        fmt.Println("Pasword matches!")
-//	    } else {
-//	        fmt.Println("Password does not match!")
-//	    }
-//	}
+//  func PaswordMatches(password, hash string) (bool, error) {
+//    return argon2.Matches(password, hash)
+//  }
+//
+// The argon2i and argon2id are the only supported variants.
 //
 // When using a string to initialize the Hasher, a mathematical
-// expression can be used to configure memory settings (ie `64*1024`)
-// so kibibyte values do not need to be calculated beforehand.
+// expression can be used to configure memory settings so kibibyte
+// values do not need to be precalculated.
 package argon2
 
 import (
@@ -60,20 +49,20 @@ import (
 	"golang.org/x/crypto/argon2"
 )
 
-// Form is the type of argon2 to use
+// Form is an argon2 variant
 type Form int
 
 const (
-	// FormI represents the `argon2i` variant
+	// FormI is the argon2i variant
 	FormI Form = iota + 1
 
-	// FormID represents the `argon2id` variant
+	// FormID is the argon2id variant
 	FormID
 )
 
-// Hasher contains the parameters used by the argon2
+// Hasher contains the parameters used by argon2
 type Hasher struct {
-	// `argon2.FormI` or `argon2.FormID`
+	// The argon2 variant
 	Form Form
 
 	// (s) Byte length of hash salt
@@ -121,7 +110,7 @@ func Matches(password, hash string) (bool, error) {
 //
 // Configuration string format:
 //
-// "f": Form (string) : "argon2i" or "argon2id"
+// "f": Form (string) : "argon2i" or "argon2id" ("argon2d" unsupported)
 //
 // "s": Salt Length (int) : Byte length of hash salt
 //
@@ -130,7 +119,7 @@ func Matches(password, hash string) (bool, error) {
 // "m": Memory (int OR expression) :
 // Memory is evaluated, so mathematical expressions can be used.
 //
-// "t": Time/Iterations (int) : Number of passes over memory
+// "t": Times/Iterations (int) : Number of passes over memory
 //
 // "p": Parallelism (int) : Number of threads
 //
